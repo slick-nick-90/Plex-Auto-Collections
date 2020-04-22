@@ -5,3 +5,5 @@
 /.idea
 /build
 /plex_auto_collections.spec
+/.vscode
+__pycache__

@@ -121,8 +121,8 @@ def tmdb_get_summary(data, type):
     person.api_key = collection.api_key
     collection.language = config_tools.TMDB().language
     person.language = collection.language
-
+    
     if type == "overview":
-        return collection.details(data).overview
+        return collection.details(data).overview, collection.details(data).poster_path
     elif type == "biography":
-        return person.details(data).biography
+        return person.details(data).biography, person.details(data).poster_path

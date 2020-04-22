@@ -101,13 +101,13 @@ def update_from_config(plex, skip_radarr=False):
             for dt_m in collections[c]["details"]:
                 rkey = get_collection(plex, c).ratingKey
                 dt_v = collections[c]["details"][dt_m]
-                if "summary" in dt_m:
-                    if "tmdb" in dt_m:
-                        try:
-                            dt_v = tmdb_get_summary(dt_v, "overview")
-                        except AttributeError:
-                            dt_v = tmdb_get_summary(dt_v, "biography")
+                if "tmdb" in dt_m:
+                    try:
+                        dt_v, poster_path = tmdb_get_summary(dt_v, "overview")
+                    except AttributeError:
+                        dt_v, poster_path = tmdb_get_summary(dt_v, "biography")
 
+                if "summary" in dt_m:
                     library_name = plex.library
                     section = plex.Server.library.section(library_name).key
                     url = plex.url + "/library/sections/" + str(section) + "/all"
@@ -119,9 +119,11 @@ def update_from_config(plex, skip_radarr=False):
                     response = requests.request("PUT", url, params=querystring)
                 poster = None
                 if "poster" in dt_m:
-                    if "tmdb" in dt_m:
+                    if "tmdb" not in dt_m:
                         poster = "https://image.tmdb.org/t/p/original/"
-                        poster = poster + tmdb_get_summary(dt_v).poster_path
+                        poster = poster + poster_path
+                        print("poster path")
+                        print(poster)
                     else:
                         poster = dt_v
                 if not poster:
@@ -140,16 +142,17 @@ def update_from_config(plex, skip_radarr=False):
                     c_name = c.replace(" ", "%20")
                     # Create url to where image would be if exists
                     poster = "http://" + host + ":" + str(port) + "/images/" + c_name
-                    try:
-                        r = requests.request("GET", poster)
-                        if not r.status_code == 404:
-                            # Create url for request to Plex
-                            url = plex.url + "/library/metadata/" + str(rkey) + "/posters"
-                            querystring = {"url": poster,
-                                               "X-Plex-Token": config.plex['token']}
-                            response = requests.request("POST", url, params=querystring)
-                    except:
-                        False
+                try:
+                    r = requests.request("GET", poster)
+                    if not r.status_code == 404:
+                        print("updating poster")
+                        # Create url for request to Plex
+                        url = plex.url + "/library/metadata/" + str(rkey) + "/posters"
+                        querystring = {"url": poster,
+                                            "X-Plex-Token": config.plex['token']}
+                        response = requests.request("POST", url, params=querystring)
+                except:
+                    False
 
 def modify_config(c_name, m, value):
     config = Config()
