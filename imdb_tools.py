@@ -115,14 +115,19 @@ def tmdb_get_movies(plex, data):
 
 
 def tmdb_get_summary(data, type):
-    collection = Collection()
-    person = Person()
-    collection.api_key = config_tools.TMDB().apikey
-    person.api_key = collection.api_key
-    collection.language = config_tools.TMDB().language
-    person.language = collection.language
-    
     if type == "overview":
-        return collection.details(data).overview, collection.details(data).poster_path
+        collection = Collection()
+        collection.api_key = config_tools.TMDB().apikey
+        collection.language = config_tools.TMDB().language
+        return collection.details(data).overview
     elif type == "biography":
-        return person.details(data).biography, person.details(data).poster_path
+        person = Person()
+        person.api_key = collection.api_key
+        person.language = collection.language
+        return person.details(data).biography
+
+def tmdb_get_poster(data):
+    collection = Collection()
+    collection.api_key = config_tools.TMDB().apikey
+    collection.language = config_tools.TMDB().language
+    return collection.details(data).poster_path

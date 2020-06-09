@@ -9,7 +9,7 @@ from plex_tools import get_actor_rkey
 from plex_tools import add_to_collection
 from plex_tools import get_collection
 from radarr_tools import add_to_radarr
-from imdb_tools import tmdb_get_summary
+from imdb_tools import tmdb_get_summary, tmdb_get_poster
 
 class Config:
     def __init__(self):
@@ -20,7 +20,9 @@ class Config:
         self.tmdb = self.data['tmdb']
         self.radarr = self.data['radarr']
         self.collections = self.data['collections']
-        self.image_server = self.data['image-server']
+        self.image_server=""
+        if hasattr(self.data, 'image-server'):
+            self.image_server = self.data['image-server']
 
 
 class Plex:
@@ -101,41 +103,41 @@ def update_from_config(plex, skip_radarr=False):
             for dt_m in collections[c]["details"]:
                 rkey = get_collection(plex, c).ratingKey
                 dt_v = collections[c]["details"][dt_m]
-                if "tmdb" in dt_m:
-                    try:
-                        dt_v, poster_path = tmdb_get_summary(dt_v, "overview")
-                    except AttributeError:
-                        dt_v, poster_path = tmdb_get_summary(dt_v, "biography")
-
                 if "summary" in dt_m:
+                    summary=dt_v
+                    if "tmdb" in dt_m:
+                        try:
+                            summary = tmdb_get_summary(dt_v, "overview")
+                        except AttributeError:
+                            summary = tmdb_get_summary(dt_v, "biography")
+
                     library_name = plex.library
                     section = plex.Server.library.section(library_name).key
                     url = plex.url + "/library/sections/" + str(section) + "/all"
 
                     querystring = {"type":"18",
                                    "id": str(rkey),
-                                   "summary.value": dt_v,
+                                   "summary.value": summary,
                                    "X-Plex-Token": config.plex['token']}
                     response = requests.request("PUT", url, params=querystring)
                 poster = None
                 if "poster" in dt_m:
                     if "tmdb" not in dt_m:
-                        poster = "https://image.tmdb.org/t/p/original/"
+                        poster_path = tmdb_get_poster(dt_v)
+                        poster = "https://image.tmdb.org/t/p/original"
                         poster = poster + poster_path
-                        print("poster path")
-                        print(poster)
                     else:
                         poster = dt_v
-                if not poster:
+                if config.image_server != '':
                     # try to pull image from image_server. File is Collection name.png
                     # Setup connection to image_server
-                    try:
+                    if hasattr(config.image_server,'host'):
                         host = config.image_server["host"]
-                    except AttributeError:
+                    else:
                         host = "127.0.0.1"
-                    try:
+                    if hasattr(config.image_server,'host'):
                         port = config.image_server["port"]
-                    except AttributeError:
+                    else:
                         port = "5000"
 
                     # Replace spaces in collection name with %20
@@ -145,7 +147,8 @@ def update_from_config(plex, skip_radarr=False):
                 try:
                     r = requests.request("GET", poster)
                     if not r.status_code == 404:
-                        print("updating poster")
+                        print("updating poster from: {}".format(poster))
+
                         # Create url for request to Plex
                         url = plex.url + "/library/metadata/" + str(rkey) + "/posters"
                         querystring = {"url": poster,
