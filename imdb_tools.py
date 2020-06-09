@@ -25,7 +25,7 @@ def imdb_get_movies(plex, data):
     title_ids = tree.xpath("//div[contains(@class, 'lister-item-image')]"
                            "//a/img//@data-tconst")
     if title_ids:
-        for m in plex.MovieLibrary.all():
+        for m in plex.p_movies:
             if 'themoviedb://' in m.guid:
                 if not tmdb.api_key == "None":
                     tmdb_id = m.guid.split('themoviedb://')[1].split('?')[0]
@@ -76,8 +76,7 @@ def tmdb_get_movies(plex, data):
     # Create dictionary of movies and their guid
     # GUIDs reference from which source Plex has pulled the metadata
     p_m_map = {}
-    p_movies = plex.MovieLibrary.all()
-    for m in p_movies:
+    for m in plex.p_movies:
         guid = m.guid
         if "themoviedb://" in guid:
             guid = guid.split('themoviedb://')[1].split('?')[0]

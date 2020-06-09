@@ -8,6 +8,7 @@ from plexapi.video import Movie
 from plex_tools import get_actor_rkey
 from plex_tools import add_to_collection
 from plex_tools import get_collection
+from plex_tools import get_all_movies
 from radarr_tools import add_to_radarr
 from imdb_tools import tmdb_get_summary, tmdb_get_poster
 
@@ -65,6 +66,7 @@ class ImageServer:
 def update_from_config(plex, skip_radarr=False):
     config = Config()
     collections = config.collections
+    plex.p_movies = get_all_movies(plex)
     for c in collections:
         print("Updating collection: {}...".format(c))
         methods = [m for m in collections[c] if m not in ("details", "subfilters")]
@@ -106,10 +108,14 @@ def update_from_config(plex, skip_radarr=False):
                 if "summary" in dt_m:
                     summary=dt_v
                     if "tmdb" in dt_m:
+                        if "list" in dt_v:
+                            cnumber=collections[c]["tmdb-list"].rsplit('/', 1)[1]
+                        else:
+                            cnumber=dt_v
                         try:
-                            summary = tmdb_get_summary(dt_v, "overview")
+                            summary = tmdb_get_summary(cnumber, "overview")
                         except AttributeError:
-                            summary = tmdb_get_summary(dt_v, "biography")
+                            summary = tmdb_get_summary(cnumber, "biography")
 
                     library_name = plex.library
                     section = plex.Server.library.section(library_name).key
@@ -122,8 +128,12 @@ def update_from_config(plex, skip_radarr=False):
                     response = requests.request("PUT", url, params=querystring)
                 poster = None
                 if "poster" in dt_m:
-                    if "tmdb" not in dt_m:
-                        poster_path = tmdb_get_poster(dt_v)
+                    if "tmdb" in dt_m:
+                        if "list" in dt_v:
+                            cnumber=collections[c]["tmdb-list"].rsplit('/', 1)[1]
+                        else:
+                            cnumber=dt_v
+                        poster_path = tmdb_get_poster(cnumber)
                         poster = "https://image.tmdb.org/t/p/original"
                         poster = poster + poster_path
                     else:
