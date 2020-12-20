@@ -125,6 +125,12 @@ def tmdb_get_summary(data, type):
         person.language = collection.language
         return person.details(data).biography
 
+def tmdb_get_background(data):
+    collection = Collection()
+    collection.api_key = config_tools.TMDB().apikey
+    collection.language = config_tools.TMDB().language
+    return collection.details(data).backdrop_path
+
 def tmdb_get_poster(data):
     collection = Collection()
     collection.api_key = config_tools.TMDB().apikey

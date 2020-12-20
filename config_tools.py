@@ -10,7 +10,7 @@ from plex_tools import add_to_collection
 from plex_tools import get_collection
 from plex_tools import get_all_movies
 from radarr_tools import add_to_radarr
-from imdb_tools import tmdb_get_summary, tmdb_get_poster
+from imdb_tools import tmdb_get_summary, tmdb_get_background, tmdb_get_poster
 
 class Config:
     def __init__(self):
@@ -126,6 +126,18 @@ def update_from_config(plex, skip_radarr=False):
                                    "summary.value": summary,
                                    "X-Plex-Token": config.plex['token']}
                     response = requests.request("PUT", url, params=querystring)
+                background = None
+                if "background" in dt_m:
+                    if "tmdb" in dt_m:
+                        if "list" in dt_v:
+                            cnumber=collections[c]["tmdb-list"].rsplit('/', 1)[1]
+                        else:
+                            cnumber=dt_v
+                        background_path = tmdb_get_background(cnumber)
+                        background = "https://image.tmdb.org/t/p/original"
+                        background = background + background_path
+                    else:
+                        background = dt_v
                 poster = None
                 if "poster" in dt_m:
                     if "tmdb" in dt_m:
@@ -154,6 +166,18 @@ def update_from_config(plex, skip_radarr=False):
                     c_name = c.replace(" ", "%20")
                     # Create url to where image would be if exists
                     poster = "http://" + host + ":" + str(port) + "/images/" + c_name
+                try:
+                    r = requests.request("GET", background)
+                    if not r.status_code == 404:
+                        print("updating background from: {}".format(background))
+
+                        # Create url for request to Plex
+                        url = plex.url + "/library/metadata/" + str(rkey) + "/backgrounds"
+                        querystring = {"url": background,
+                                            "X-Plex-Token": config.plex['token']}
+                        response = requests.request("POST", url, params=querystring)
+                except:
+                    False
                 try:
                     r = requests.request("GET", poster)
                     if not r.status_code == 404:
