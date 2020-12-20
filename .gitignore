@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /config.yml
 /dist/config.yml
 /venv/
@@ -7,3 +8,16 @@
 /plex_auto_collections.spec
 /.vscode
 __pycache__
+=======
+config.yml
+**/dist
+**/build
+*.spec
+**/__pycache__
+/.vscode
+app/images
+app/config.yml
+config/config-*
+config/*.pickle
+**/cache.db*
+>>>>>>> burk/master
