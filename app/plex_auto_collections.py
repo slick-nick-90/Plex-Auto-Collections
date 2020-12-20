@@ -119,6 +119,7 @@ def update_from_config(config_path, plex, headless=False, no_meta=False, no_imag
         "genres": "genre",
         "studios": "studio", "network": "studio", "networks": "studio",
         "years": "year",
+        "producers": "producer",
         "writers": "writer",
         "tmdb-list": "tmdb_collection",
         "tmdb-poster": "tmdb_poster",
@@ -154,8 +155,9 @@ def update_from_config(config_path, plex, headless=False, no_meta=False, no_imag
         "genre", #"genre.not",
         "studio", #"studio.not",
         "year", #"year.not",
+        "producer", #"producer.not",
         "writer", #"writer.not",
-        "tmdb_actor", "tmdb_director", "tmdb_writer"
+        "tmdb_actor", "tmdb_director", "tmdb_producer", "tmdb_writer"
     ]
     show_only_lists = [
         "tmdb_show",
@@ -175,8 +177,9 @@ def update_from_config(config_path, plex, headless=False, no_meta=False, no_imag
         "country", #"country.not",
         "decade", #"decade.not",
         "director", #"director.not",
+        "producer", #"producer.not"
         "writer", #"writer.not",
-        "tmdb_actor", "tmdb_director", "tmdb_writer"
+        "tmdb_actor", "tmdb_director", "tmdb_producer", "tmdb_writer"
     ]
     all_filters = [
         "actor", "actor.not",
@@ -186,6 +189,7 @@ def update_from_config(config_path, plex, headless=False, no_meta=False, no_imag
         "genre", "genre.not",
         "studio", "studio.not",
         "year", "year.not", "year.gte", "year.lte",
+        "producer", "producer.not"
         "writer", "writer.not",
         "rating.gte", "rating.lte",
         "max_age",
@@ -197,6 +201,7 @@ def update_from_config(config_path, plex, headless=False, no_meta=False, no_imag
     movie_only_filters = [
         "country", "country.not",
         "director", "director.not",
+        "producer", "producer.not"
         "writer", "writer.not",
         "video_resolution", "video_resolution.not",
         "audio_language", "audio_language.not",
@@ -207,7 +212,7 @@ def update_from_config(config_path, plex, headless=False, no_meta=False, no_imag
         "summary", "tmdb_summary", "tmdb_biography",
         "collection_mode", "collection_order",
         "poster", "tmdb_poster", "tmdb_profile", "file_poster",
-        "background", "file_background",
+        "background", "tmdb_background", "file_background",
         "name_mapping"
     ]
     print("|\n| Running collection update press Ctrl+C to abort at anytime")

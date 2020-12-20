@@ -194,6 +194,7 @@ def add_to_collection(config_path, plex, method, value, c, map, filters=None):
         "genre": "genres",
         "studio": "studio",
         "year": "year",
+        "producer": "producers",
         "writer": "writers",
         "rating": "rating",
         "max_age": "max_age",
@@ -259,7 +260,7 @@ def add_to_collection(config_path, plex, method, value, c, map, filters=None):
                                         mv_attrs = ([subtitle_stream.language for subtitle_stream in part.subtitleStreams()])
                         elif method in ["contentRating", "studio", "year", "rating", "originallyAvailableAt"]:                    # Otherwise, it's a string. Make it a list.
                             mv_attrs = [str(getattr(current_m, method))]
-                        elif method in ["actors", "countries", "directors", "genres", "writers"]:
+                        elif method in ["actors", "countries", "directors", "genres", "producers", "writers"]:
                             mv_attrs = [getattr(x, 'tag') for x in getattr(current_m, method)]
 
                         # Get the intersection of the user's terms and movie's terms

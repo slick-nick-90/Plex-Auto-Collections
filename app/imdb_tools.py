@@ -128,7 +128,11 @@ def tmdb_get_movies(config_path, plex, data, is_list=False):
     if t_movie.api_key == "None":
         raise KeyError("Invalid TMDb API Key")
 
-    tmdb = List() if is_list else Collection()
+    if is_list in ["tmdb_list", "tmdb_movie", "tmdb_company"]:
+        tmdb = List()
+    else:
+        is_list=False
+        tmdb = Collection()
     tmdb.api_key = t_movie.api_key
     t_col = tmdb.details(tmdb_id)
 
@@ -361,7 +365,11 @@ def tmdb_get_metadata(config_path, data, type):
             elif type == "poster_path":
                 return tmdb_url_prefix + collection.details(id).poster_path
             elif type == "backdrop_path":
-                return tmdb_url_prefix + collection.details(id).backdrop_path
+                backdrop_path=collection.details(id).backdrop_path
+                if backdrop_path:
+                    return tmdb_url_prefix + collection.details(id).backdrop_path
+                else:
+                    return None
         except AttributeError:
             media = Movie() if is_movie else TV()
             media.api_key = api_key
