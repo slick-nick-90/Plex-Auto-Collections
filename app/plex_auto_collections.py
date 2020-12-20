@@ -408,7 +408,7 @@ def update_from_config(config_path, plex, headless=False, no_meta=False, no_imag
                         if "summary" not in details:
                             details["summary"] = tmdb_get_metadata(config_path, id[1][0], "overview")
                         details["poster"] = ["url", tmdb_get_metadata(config_path, id[1][0], "poster_path"), method_name]
-                        details["poster"] = ["url", tmdb_get_metadata(config_path, id[1][0], "backdrop_path"), method_name]
+                        details["background"] = ["url", tmdb_get_metadata(config_path, id[1][0], "backdrop_path"), method_name]
                         tmdb_id = id[1][0]
                     methods.append(id)
                 elif method_name == "tmdb_list": #TODO: validate
